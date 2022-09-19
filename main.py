@@ -1,6 +1,8 @@
 import pygame
 import random
 
+from pygame import mixer
+
 pygame.init()
 
 screen = pygame.display.set_mode((800, 600))
@@ -8,6 +10,9 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Nyonde")
 icon = pygame.image.load("icon.png")
 pygame.display.set_icon(icon)
+
+mixer.music.load("background.mp3")
+mixer.music.play(-1)
 
 bird_img = pygame.image.load("nyonde.png")
 bird_x = 35
@@ -107,6 +112,8 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 bird_y_change = 3
+                flap_sound = mixer.Sound("flap.mp3")
+                flap_sound.play()
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
                 bird_y_change = 0
