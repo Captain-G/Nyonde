@@ -88,10 +88,10 @@ def has_crashed(bird_x_pos, bird_y_pos, obstacle_y_pos, obstacle_x_pos):
     obstacle_end = obstacle_y_pos + 64
     if obstacle_x_pos == bird_x_pos:
         if bird_y_pos >= obstacle_start or bird_y <= obstacle_end:
-            print("Has crashed")
+            # print("Has crashed")
             return True
         else:
-            print("Has not crashed")
+            # print("Has not crashed")
             return False
 
 
