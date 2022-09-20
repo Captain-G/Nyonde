@@ -6,6 +6,8 @@ from pygame import mixer
 
 pygame.init()
 
+# clock = pygame.time.Clock()
+
 screen = pygame.display.set_mode((800, 600))
 
 pygame.display.set_caption("Nyonde")
@@ -35,6 +37,11 @@ obstacle_img_3 = pygame.image.load("obstacle.png")
 obstacle_x_3 = 860
 obstacle_y_3 = random.randint(0, 536)
 obstacle_x_change_3 = 0.5
+
+stone_img = pygame.image.load("stone.png")
+stone_x = 860
+stone_y = random.randint(0, 536)
+stone_x_change = 1.0
 
 score_value = 0
 
@@ -88,9 +95,13 @@ def bonus_powerup_5(x, y):
     screen.blit(bonus_5_img, (x, y))
 
 
+def stone(x, y):
+    screen.blit(stone_img, (x, y))
+
+
 def collected_powerup(bonus_x, bonus_y, birdx, birdy):
     distance = math.sqrt((math.pow(bonus_x - birdx, 2)) + (math.pow(bonus_y - birdy, 2)))
-    if distance < 27:
+    if distance < 30:
         return True
     else:
         return False
@@ -111,6 +122,16 @@ def has_crashed(bird_x_pos, bird_y_pos, obstacle_y_pos, obstacle_x_pos):
         else:
             # print("Ponea")
             return False
+
+
+def stone_hit(bird_x_pos, bird_y_pos, stone_x_pos, stone_y_pos):
+    distance = math.sqrt((math.pow(bird_x_pos - stone_x_pos, 2)) + (math.pow(stone_y_pos - bird_y_pos, 2)))
+    if distance < 30:
+        # print("Stone Hit")
+        return True
+    else:
+        # print("Miss!")
+        return False
 
 
 def game_over_text(score):
@@ -155,11 +176,13 @@ while running:
     obstacle_x_2 -= obstacle_x_change_2
     obstacle_x_3 -= obstacle_x_change_3
     bonus_5_x -= bonus_5_change
+    stone_x -= stone_x_change
 
     obstacle(obstacle_x, obstacle_y)
     obstacle2(obstacle_x_2, obstacle_y_2)
     obstacle3(obstacle_x_3, obstacle_y_3)
     bonus_powerup_5(bonus_5_x, bonus_5_y)
+    stone(stone_x, stone_y)
 
     if obstacle_x <= 0:
         obstacle_x = 750
@@ -179,6 +202,12 @@ while running:
         powerup_sound = mixer.Sound("powerup.mp3")
         powerup_sound.play()
 
+    hit_by_stone = stone_hit(bird_x, bird_y, stone_x, stone_y)
+    if hit_by_stone:
+        stone_sound = mixer.Sound("stone.mp3")
+        stone_sound.play()
+        game_over_text(score_value)
+
     if bird_x == obstacle_x:
         score_value = score_value + 1
     elif bird_x == obstacle_x_2:
@@ -193,7 +222,13 @@ while running:
     if crash1 or crash2 or crash3:
         # game_over_text(score_value)
         print("crashed")
+
+    if stone_x == 0:
+        stone_x = 1000
+        stone_y = random.randint(0, 536)
+
     bird_y -= bird_y_change
     show_score(text_x, text_y)
     nyonde(bird_x, bird_y)
+    # clock.tick(200)
     pygame.display.update()
