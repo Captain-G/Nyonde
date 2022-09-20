@@ -169,8 +169,9 @@ while running:
         bird_y = 0
     elif bird_y > 536:
         bird_y = 536
-        final_score = score_value
-        game_over_text(final_score)
+        break
+        # final_score = score_value
+        # game_over_text(final_score)
 
     obstacle_x -= obstacle_x_change
     obstacle_x_2 -= obstacle_x_change_2
@@ -206,7 +207,7 @@ while running:
     if hit_by_stone:
         stone_sound = mixer.Sound("stone.mp3")
         stone_sound.play()
-        game_over_text(score_value)
+        break
 
     if bird_x == obstacle_x:
         score_value = score_value + 1
@@ -221,7 +222,8 @@ while running:
 
     if crash1 or crash2 or crash3:
         # game_over_text(score_value)
-        print("crashed")
+        # print("crashed")
+        break
 
     if stone_x == 0:
         stone_x = 1000
@@ -232,3 +234,16 @@ while running:
     nyonde(bird_x, bird_y)
     # clock.tick(200)
     pygame.display.update()
+
+
+game_over = True
+while game_over:
+    screen.fill((0, 0, 0))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_over = False
+    final_score = score_value
+    game_over_text(final_score)
+    show_score(text_x, text_y)
+    pygame.display.update()
+
