@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 from pygame import mixer
 
@@ -35,7 +36,14 @@ obstacle_x_3 = 860
 obstacle_y_3 = random.randint(0, 536)
 obstacle_x_change_3 = 0.5
 
+score_value = 0
 
+bonus_5_img = pygame.image.load("bonus5.png")
+bonus_5_x = 300
+bonus_5_y = random.randint(0, 536)
+bonus_5_change = 0.5
+
+over_font = pygame.font.Font("blackParadeFont.otf", 128)
 #
 # obstacle_img = []
 # obstacle_x = []
@@ -56,14 +64,10 @@ def nyonde(x, y):
     screen.blit(bird_img, (x, y))
 
 
-def obstacle(x, y, bird_x_val, score_value):
+def obstacle(x, y):
     screen.blit(obstacle_img, (x, y))
     screen.blit(obstacle_img, (x, y + 250))
     screen.blit(obstacle_img, (x, y - 250))
-    if bird_x_val == x:
-        score_value = score_value + 1
-    if score_value != 0:
-        print(score_value)
 
 
 def obstacle2(x, y):
@@ -78,24 +82,44 @@ def obstacle3(x, y):
     screen.blit(obstacle_img, (x, y - 250))
 
 
+def bonus_powerup_5(x, y):
+    screen.blit(bonus_5_img, (x, y))
+
+
+def collected_powerup(bonus_x, bonus_y, birdx, birdy):
+    distance = math.sqrt((math.pow(bonus_x - birdx, 2)) + (math.pow(bonus_y - birdy, 2)))
+    if distance < 27:
+        return True
+    else:
+        return False
+
+
 def show_score(x, y):
     score = font.render(f"Score : {score_value}", True, (0, 0, 0))
     screen.blit(score, (x, y))
 
 
 def has_crashed(bird_x_pos, bird_y_pos, obstacle_y_pos, obstacle_x_pos):
-    obstacle_start = obstacle_y_pos
+    obstacle_start = obstacle_y_pos - 10
     obstacle_end = obstacle_y_pos + 64
     if obstacle_x_pos == bird_x_pos:
-        if bird_y_pos >= obstacle_start or bird_y <= obstacle_end:
+        if bird_y_pos >= obstacle_start and bird_y <= obstacle_end:
             # print("Has crashed")
             return True
         else:
-            # print("Has not crashed")
+            # print("Ponea")
             return False
 
 
-score_value = 0
+def game_over_text(score):
+    over_text = over_font.render("GAME OVER!", True, (255, 255, 255))
+    over_score = over_font.render(f"{score}", True, (255, 255, 255))
+    screen.fill((0, 0, 0))
+    screen.blit(over_text, (200, 250))
+    screen.blit(over_score, (380, 50))
+
+
+# score_value = 0
 font = pygame.font.Font("blackParadeFont.otf", 50)
 text_x = 10
 text_y = 10
@@ -122,15 +146,18 @@ while running:
         bird_y = 0
     elif bird_y > 536:
         bird_y = 536
+        final_score = score_value
+        game_over_text(final_score)
 
     obstacle_x -= obstacle_x_change
     obstacle_x_2 -= obstacle_x_change_2
     obstacle_x_3 -= obstacle_x_change_3
+    bonus_5_x -= bonus_5_change
 
-    obstacle(obstacle_x, obstacle_y, bird_x, score_value)
+    obstacle(obstacle_x, obstacle_y)
     obstacle2(obstacle_x_2, obstacle_y_2)
     obstacle3(obstacle_x_3, obstacle_y_3)
-    # obstacle(obstacle_x + diff_two_obstacles, obstacle_y)
+    bonus_powerup_5(bonus_5_x, bonus_5_y)
 
     if obstacle_x <= 0:
         obstacle_x = 750
@@ -139,7 +166,27 @@ while running:
     if obstacle_x_3 <= 0:
         obstacle_x_3 = 750
 
+    if bonus_5_x < 0:
+        bonus_5_x = 3200
+
+    # collected the powerup
+    collected = collected_powerup(bonus_5_x, bonus_5_y, bird_x, bird_y)
+    if collected:
+        bonus_5_x = 3200
+        score_value += 5
+        powerup_sound = mixer.Sound("powerup.mp3")
+        powerup_sound.play()
+
+    if bird_x == obstacle_x:
+        score_value = score_value + 1
+    elif bird_x == obstacle_x_2:
+        score_value = score_value + 1
+    elif bird_x == obstacle_x_3:
+        score_value = score_value + 1
+
     has_crashed(bird_x, bird_y, obstacle_y, obstacle_x)
+    has_crashed(bird_x, bird_y, obstacle_y_2, obstacle_x_2)
+    has_crashed(bird_x, bird_y, obstacle_y_3, obstacle_x_3)
     bird_y -= bird_y_change
     show_score(text_x, text_y)
     nyonde(bird_x, bird_y)
