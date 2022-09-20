@@ -44,6 +44,8 @@ bonus_5_y = random.randint(0, 536)
 bonus_5_change = 0.5
 
 over_font = pygame.font.Font("blackParadeFont.otf", 128)
+
+
 #
 # obstacle_img = []
 # obstacle_x = []
@@ -184,9 +186,13 @@ while running:
     elif bird_x == obstacle_x_3:
         score_value = score_value + 1
 
-    has_crashed(bird_x, bird_y, obstacle_y, obstacle_x)
-    has_crashed(bird_x, bird_y, obstacle_y_2, obstacle_x_2)
-    has_crashed(bird_x, bird_y, obstacle_y_3, obstacle_x_3)
+    crash1 = has_crashed(bird_x, bird_y, obstacle_y, obstacle_x)
+    crash2 = has_crashed(bird_x, bird_y, obstacle_y_2, obstacle_x_2)
+    crash3 = has_crashed(bird_x, bird_y, obstacle_y_3, obstacle_x_3)
+
+    if crash1 or crash2 or crash3:
+        # game_over_text(score_value)
+        print("crashed")
     bird_y -= bird_y_change
     show_score(text_x, text_y)
     nyonde(bird_x, bird_y)
